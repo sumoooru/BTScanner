@@ -9,18 +9,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -84,6 +85,26 @@ public class MainActivity extends AppCompatActivity {
         devListView = (ListView) findViewById(R.id.dev_list);
         assert devListView != null;
         devListView.setAdapter(devListAdapter);
+        final AlertDialog.Builder alertInfo = new AlertDialog.Builder(this)
+                .setTitle(R.string.app_name)
+                .setMessage(R.string.about_dialog_message);
+        devListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int pos, long id) {
+                BluetoothDevice device = devList.get(pos);
+                alertInfo.setMessage("name : " + device.getName() +
+                        "\naddress : " + device.getAddress() +
+                        "\nstate : " + (
+                        device.getBondState() == BluetoothDevice.BOND_NONE ? "not paired" :
+                        device.getBondState() == BluetoothDevice.BOND_BONDED ? "paired" :
+                        device.getBondState() == BluetoothDevice.BOND_BONDING ? "under pairing" :
+                        "?")
+                );
+
+                alertInfo.show();
+            }
+        });
 
         btAdapter = BluetoothAdapter.getDefaultAdapter();
         if (btAdapter == null) {
